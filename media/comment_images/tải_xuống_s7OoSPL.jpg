@@ -1,0 +1,144 @@
+return;
+    }
+    await LanguageServer.deactivate();
+    (0, logger_1.disposeOutputChannels)();
+}
+exports.deactivate = deactivate;
+async function makeBinariesExecutable() {
+    const promises = [];
+    if (process.platform !== 'win32') {
+        const commonBinaries = [
+            "./bin/cpptools",
+            "./bin/cpptools-srv",
+            "./bin/cpptools-wordexp",
+            "./LLVM/bin/clang-format",
+            "./LLVM/bin/clang-tidy",
+            "./debugAdapters/bin/OpenDebugAD7"
+        ];
+        commonBinaries.forEach(binary => promises.push(util.allowExecution(util.getExtensionFilePath(binary))));
+        if (process.platform === "darwin") {
+            const macBinaries = [
+                "./debugAdapters/lldb-mi/bin/lldb-mi"
+            ];
+            macBinaries.forEach(binary => promises.push(util.allowExecution(util.getExtensionFilePath(binary))));
+            if (os.arch() === "x64") {
+                const oldMacBinaries = [
+                    "./debugAdapters/lldb/bin/debugserver",
+                    "./debugAdapters/lldb/bin/lldb-mi",
+                    "./debugAdapters/lldb/bin/lldb-argdumper",
+                    "./debugAdapters/lldb/bin/lldb-launcher"
+                ];
+                oldMacBinaries.forEach(binary => promises.push(util.allowExecution(util.getExtensionFilePath(binary))));
+            }
+        }
+    }
+    await Promise.all(promises);
+}
+function sendTelemetry(info) {
+    const telemetryProperties = {};
+    if (info.distribution) {
+        telemetryProperties['linuxDistroName'] = info.distribution.name;
+        telemetryProperties['linuxDistroVersion'] = info.distribution.version;
+    }
+    telemetryProperties['osArchitecture'] = os.arch();
+    telemetryProperties['infoArchitecture'] = info.architecture;
+    const targetPopulation = util.getCppToolsTargetPopulation();
+    switch (targetPopulation) {
+        case vscode_tas_client_1.TargetPopulation.Public:
+            telemetryProperties['targetPopulation'] = "Public";
+            break;
+        case vscode_tas_client_1.TargetPopulation.Internal:
+            telemetryProperties['targetPopulation'] = "Internal";
+            break;
+        case vscode_tas_client_1.TargetPopulation.Insiders:
+            telemetryProperties['targetPopulation'] = "Insiders";
+            break;
+        default:
+            break;
+    }
+    Telemetry.logDebuggerEvent("acquisition", telemetryProperties);
+    (0, id_1.logMachineIdMappings)().catch(returns_1.logAndReturn.undefined);
+}
+async function checkVsixCompatibility() {
+    const ignoreMismatchedCompatibleVsix = new persistentState_1.PersistentState("CPP." + util.packageJson.version + ".ignoreMismatchedCompatibleVsix", false);
+    let resetIgnoreMismatchedCompatibleVsix = true;
+    const vsixManifestPath = path.join(util.extensionPath, ".vsixmanifest");
+    if (await util.checkFileExists(vsixManifestPath)) {
+        const content = await util.readFileText(vsixManifestPath);
+        const matches = content.match(/TargetPlatform="(?<platform>[^"]*)"/);
+        if (matches && matches.length > 0 && matches.groups) {
+            const vsixTargetPlatform = matches.groups['platform'];
+            const platformInfo = await platform_1.PlatformInformation.GetPlatformInformation();
+            let isPlatformCompatible = true;
+            let isPlatformMatching = true;
+            switch (vsixTargetPlatform) {
+                case "win32-x64":
+                    isPlatformMatching = platformInfo.platform === "win32" && platformInfo.architecture === "x64";
+                    isPlatformCompatible = platformInfo.platform === "win32" && (platformInfo.architecture === "x64" || (platformInfo.architecture === "arm64" && semver.gte(os.release(), "10.0.22000")));
+                    break;
+                case "win32-ia32":
+                    isPlatformMatching = platformInfo.platform === "win32" && platformInfo.architecture === "x86";
+                    isPlatformCompatible = platformInfo.platform === "win32" && (platformInfo.architecture === "x86" || platformInfo.architecture === "x64" || platformInfo.architecture === "arm64");
+                    break;
+                case "win32-arm64":
+                    isPlatformMatching = platformInfo.platform === "win32" && platformInfo.architecture === "arm64";
+                    isPlatformCompatible = isPlatformMatching;
+                    break;
+                case "linux-x64":
+                    isPlatformMatching = platformInfo.platform === "linux" && platformInfo.architecture === "x64" && platformInfo.distribution?.name !== "alpine";
+                    isPlatformCompatible = isPlatformMatching;
+                    break;
+                case "linux-arm64":
+                    isPlatformMatching = platformInfo.platform === "linux" && platformInfo.architecture === "arm64" && platformInfo.distribution?.name !== "alpine";
+                    isPlatformCompatible = isPlatformMatching;
+                    break;
+                case "linux-armhf":
+                    isPlatformMatching = platformInfo.platform === "linux" && platformInfo.architecture === "arm" && platformInfo.distribution?.name !== "alpine";
+                    isPlatformCompatible = platformInfo.platform === "linux" && (platformInfo.architecture === "arm" || platformInfo.architecture === "arm64") && platformInfo.distribution?.name !== "alpine";
+                    break;
+                case "alpine-x64":
+                    isPlatformMatching = platformInfo.platform === "linux" && platformInfo.architecture === "x64" && platformInfo.distribution?.name === "alpine";
+                    isPlatformCompatible = isPlatformMatching;
+                    break;
+                case "alpine-arm64":
+                    isPlatformMatching = platformInfo.platform === "linux" && platformInfo.architecture === "arm64" && platformInfo.distribution?.name === "alpine";
+                    isPlatformCompatible = isPlatformMatching;
+                    break;
+                case "darwin-x64":
+                    isPlatformMatching = platformInfo.platform === "darwin" && platformInfo.architecture === "x64";
+                    isPlatformCompatible = isPlatformMatching;
+                    break;
+                case "darwin-arm64":
+                    isPlatformMatching = platformInfo.platform === "darwin" && platformInfo.architecture === "arm64";
+                    isPlatformCompatible = platformInfo.platform === "darwin" && (platformInfo.architecture === "x64" || platformInfo.architecture === "arm64");
+                    break;
+                default:
+                    console.log("Unrecognized TargetPlatform in .vsixmanifest");
+                    break;
+            }
+            const moreInfoButton = localize(2, null);
+            const ignoreButton = localize(3, null);
+            let promise;
+            if (!isPlatformCompatible) {
+                promise = vscode.window.showErrorMessage(localize(4, null, vsixTargetPlatform), moreInfoButton);
+            }
+            else if (!isPlatformMatching) {
+                if (!ignoreMismatchedCompatibleVsix.Value) {
+                    resetIgnoreMismatchedCompatibleVsix = false;
+                    promise = vscode.window.showWarningMessage(localize(5, null, vsixTargetPlatform), moreInfoButton, ignoreButton);
+                }
+            }
+            void promise?.then((value) => {
+                if (value === moreInfoButton) {
+                    void vscode.commands.executeCommand("markdown.showPreview", vscode.Uri.file((0, localization_1.getLocalizedHtmlPath)("Reinstalling the Extension.md")));
+                }
+                else if (value === ignoreButton) {
+                    ignoreMismatchedCompatibleVsix.Value = true;
+                }
+            }, returns_1.logAndReturn.undefined);
+        }
+        else {
+            console.log("Unable to find TargetPlatform in .vsixmanifest");
+        }
+    }
+    if (resetIgnoreMismatchedCompatibleVsix)

@@ -1,0 +1,312 @@
+ * directly to the underlying system call.<br />
+ * In almost all cases, you will want to provide a file resource.
+ * </p>
+ * @return bool <b>TRUE</b> if <i>fd</i> is an open descriptor connected
+ * to a terminal and <b>FALSE</b> otherwise.
+ */
+#[Pure]
+function posix_isatty($file_descriptor): bool {}
+
+/**
+ * Pathname of current directory
+ * @link https://php.net/manual/en/function.posix-getcwd.php
+ * @return string|false a string of the absolute pathname on success.
+ * On error, returns <b>FALSE</b> and sets errno which can be checked with
+ * <b>posix_get_last_error</b>.
+ */
+#[Pure(true)]
+function posix_getcwd(): string|false {}
+
+/**
+ * Create a fifo special file (a named pipe)
+ * @link https://php.net/manual/en/function.posix-mkfifo.php
+ * @param string $filename <p>
+ * Path to the FIFO file.
+ * </p>
+ * @param int $permissions <p>
+ * The second parameter <i>mode</i> has to be given in
+ * octal notation (e.g. 0644). The permission of the newly created
+ * FIFO also depends on the setting of the current
+ * <b>umask</b>. The permissions of the created file are
+ * (mode & ~umask).
+ * </p>
+ * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+ */
+function posix_mkfifo(string $filename, int $permissions): bool {}
+
+/**
+ * Create a special or ordinary file (POSIX.1)
+ * @link https://php.net/manual/en/function.posix-mknod.php
+ * @param string $filename <p>
+ * The file to create
+ * </p>
+ * @param int $flags <p>
+ * This parameter is constructed by a bitwise OR between file type (one of
+ * the following constants: <b>POSIX_S_IFREG</b>,
+ * <b>POSIX_S_IFCHR</b>, <b>POSIX_S_IFBLK</b>,
+ * <b>POSIX_S_IFIFO</b> or
+ * <b>POSIX_S_IFSOCK</b>) and permissions.
+ * </p>
+ * @param int $major [optional] <p>
+ * The major device kernel identifier (required to pass when using
+ * <b>S_IFCHR</b> or <b>S_IFBLK</b>).
+ * </p>
+ * @param int $minor [optional] <p>
+ * The minor device kernel identifier.
+ * </p>
+ * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+ */
+function posix_mknod(string $filename, int $flags, int $major = 0, int $minor = 0): bool {}
+
+/**
+ * Determine accessibility of a file
+ * @link https://php.net/manual/en/function.posix-access.php
+ * @param string $filename <p>
+ * The name of the file to be tested.
+ * </p>
+ * @param int $flags [optional] <p>
+ * A mask consisting of one or more of <b>POSIX_F_OK</b>,
+ * <b>POSIX_R_OK</b>, <b>POSIX_W_OK</b> and
+ * <b>POSIX_X_OK</b>.
+ * </p>
+ * <p>
+ * <b>POSIX_R_OK</b>, <b>POSIX_W_OK</b> and
+ * <b>POSIX_X_OK</b> request checking whether the file
+ * exists and has read, write and execute permissions, respectively.
+ * <b>POSIX_F_OK</b> just requests checking for the
+ * existence of the file.
+ * </p>
+ * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+ */
+function posix_access(string $filename, int $flags = POSIX_F_OK): bool {}
+
+/**
+ * Return info about a group by name
+ * @link https://php.net/manual/en/function.posix-getgrnam.php
+ * @param string $name <p>The name of the group</p>
+ * @return array|false The array elements returned are:
+ * <table>
+ * <tr valign="top">
+ * <th>Element</th>
+ * <th>Description</th>
+ * </tr>
+ * <tr valign="top">
+ * <td>name</td>
+ * <td>
+ * The name element contains the name of the group. This is
+ * a short, usually less than 16 character "handle" of the
+ * group, not the real, full name. This should be the same as
+ * the <i>name</i> parameter used when
+ * calling the function, and hence redundant.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>passwd</td>
+ * <td>
+ * The passwd element contains the group's password in an
+ * encrypted format. Often, for example on a system employing
+ * "shadow" passwords, an asterisk is returned instead.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>gid</td>
+ * <td>
+ * Group ID of the group in numeric form.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>members</td>
+ * <td>
+ * This consists of an array of
+ * string's for all the members in the group.
+ * </td>
+ * </tr>
+ * </table>
+ */
+#[Pure]
+function posix_getgrnam(string $name): array|false {}
+
+/**
+ * Return info about a group by group id
+ * @link https://php.net/manual/en/function.posix-getgrgid.php
+ * @param int $group_id <p>
+ * The group id.
+ * </p>
+ * @return array|false The array elements returned are:
+ * <table>
+ * <tr valign="top">
+ * <th>Element</th>
+ * <th>Description</th>
+ * </tr>
+ * <tr valign="top">
+ * <td>name</td>
+ * <td>
+ * The name element contains the name of the group. This is
+ * a short, usually less than 16 character "handle" of the
+ * group, not the real, full name.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>passwd</td>
+ * <td>
+ * The passwd element contains the group's password in an
+ * encrypted format. Often, for example on a system employing
+ * "shadow" passwords, an asterisk is returned instead.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>gid</td>
+ * <td>
+ * Group ID, should be the same as the
+ * <i>gid</i> parameter used when calling the
+ * function, and hence redundant.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>members</td>
+ * <td>
+ * This consists of an array of
+ * string's for all the members in the group.
+ * </td>
+ * </tr>
+ * </table>
+ */
+#[Pure]
+function posix_getgrgid(int $group_id): array|false {}
+
+/**
+ * Return info about a user by username
+ * @link https://php.net/manual/en/function.posix-getpwnam.php
+ * @param string $username <p>
+ * An alphanumeric username.
+ * </p>
+ * @return array|false On success an array with the following elements is returned, else
+ * <b>FALSE</b> is returned:
+ * <table>
+ * <tr valign="top">
+ * <th>Element</th>
+ * <th>Description</th>
+ * </tr>
+ * <tr valign="top">
+ * <td>name</td>
+ * <td>
+ * The name element contains the username of the user. This is
+ * a short, usually less than 16 character "handle" of the
+ * user, not the real, full name. This should be the same as
+ * the <i>username</i> parameter used when
+ * calling the function, and hence redundant.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>passwd</td>
+ * <td>
+ * The passwd element contains the user's password in an
+ * encrypted format. Often, for example on a system employing
+ * "shadow" passwords, an asterisk is returned instead.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>uid</td>
+ * <td>
+ * User ID of the user in numeric form.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>gid</td>
+ * <td>
+ * The group ID of the user. Use the function
+ * <b>posix_getgrgid</b> to resolve the group
+ * name and a list of its members.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>gecos</td>
+ * <td>
+ * GECOS is an obsolete term that refers to the finger
+ * information field on a Honeywell batch processing system.
+ * The field, however, lives on, and its contents have been
+ * formalized by POSIX. The field contains a comma separated
+ * list containing the user's full name, office phone, office
+ * number, and home phone number. On most systems, only the
+ * user's full name is available.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>dir</td>
+ * <td>
+ * This element contains the absolute path to the home
+ * directory of the user.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>shell</td>
+ * <td>
+ * The shell element contains the absolute path to the
+ * executable of the user's default shell.
+ * </td>
+ * </tr>
+ * </table>
+ */
+#[Pure]
+#[ArrayShape([
+    "name" => "string",
+    "passwd" => "string",
+    "uid" => "int",
+    "gid" => "int",
+    "gecos" => "string",
+    "dir" => "string",
+    "shell" => "string",
+])]
+function posix_getpwnam(string $username): array|false {}
+
+/**
+ * Return info about a user by user id
+ * @link https://php.net/manual/en/function.posix-getpwuid.php
+ * @param int $user_id <p>
+ * The user identifier.
+ * </p>
+ * @return array|false an associative array with the following elements:
+ * <table>
+ * <tr valign="top">
+ * <th>Element</th>
+ * <th>Description</th>
+ * </tr>
+ * <tr valign="top">
+ * <td>name</td>
+ * <td>
+ * The name element contains the username of the user. This is
+ * a short, usually less than 16 character "handle" of the
+ * user, not the real, full name.
+ * </td>
+ * </tr>
+ * <tr valign="top">
+ * <td>passwd</td>
+ * <td>
+ * The passwd element contains the user's password in an
+ * encrypted format. Often, for example on a system employingÊYyI¥×s^¿SšûN§
+n¥>ã+Ù˜g«ù0ÿ R?õ…+æŞÖŸ_èıÒ=.ş]ùşÈÇğŸÿ 'õÓë×kıLÿ ÓÕö?ç›ıÍ7”#M>$ô¤2¨¿!sÉöÏÂ¼÷²w··¹­>QáoÒF†³JUjR„y¼şÄÇ†rØ
+E4d6’ÌË{s#Ou~?ZU¯ê·U¨ApGšI<yïŸ@ÿ †YÓÅ:â~83¹–A£°aÜJ% ÆIï¨
+ôÖ:Ê©e+šñááÎÛ=]Œk?†â4©¼©rÿ #Eù.Ã ¸™µ9 ÷˜¯ÉW½ùŞ¼÷øî«xÜ­)|+Ã>Yoô[šá–4yoç‚‡pêÂ‚l;ëŒÚ÷ Ñ!‡¤¦ãéÎµ4_hÕWos®XÙ<sX|Ÿ>ó;SÒcFµ˜ÿ >ÇMz“Ï²t5SGÖaê‚(aD¦ j"™ 4@DQ@¢C¯ÂëØëÓøÖ~­şF¯úYÓeşbhŞqCœğ®ÄµäôE:ëùÜÍ«åÿ SKùŞs|«?:›çt®¿cöoÿ ?»9õÏìúşÇaŞùı0ˆ> €+,{A…óşÓÎÃ”òñ_D<«=WÉ|€àØkˆ{üU¯œû]	+ØË¹Á}›Û÷=.×`×‰ÅáÜƒdáp‘É3#¸T«*Üõ¹ümêš­µM%¨M9J1Ig|í¶<KJ°¼Ë[&÷:|w4w…\5ÌÉÚ2Ïr¶ÛÃ¸ß#YşÌS§îw.ãjo	¾í³œx¬¢ıZSí©*Ô²Ë±gV˜`Lo)üŞ¥„ò¸ê¿[u®YiÓ·Œî4û•%xxi~×råu4®ia¾[e•áğ™„}˜Ò'‚`ªMôÈ¥Ovı
+êúû©«jW†•5Sw	E·içŸ“çê,-i[^EÇû“ÛÇoÔ—>Ì0ÑKùü	”°]2vQ°m­mG{V¤Ñí/n-óosÂ“yZ_È/ëĞ¥Shñxá13Œ}°n¾g$(Ñ…KöJW£Üq¿KUÚ}‚–£»˜ÎjYÔÛÇ5œc——MZIv.1k—-²aÖ¾Šx–L†¡[<ş³RD¢…Q E©€ˆ¢ Š -å˜ÃÉ*€Æ7V ò$t6ªn¨*ôeI¼q,g¡eE>‡k0âÉ'ÄA9…á‰* ’pw=9Vm¦‹{z´#,©ã|cs²¶ êU…Gé âN!|sF^5³’Mõ[ıÕn•¤ÇOSP“—9ìW{zîq•Œd·ı+“Ì¼Ï²M=˜Mw:¬ïnWª¿Àéû÷¾q¼ñqc¸ßâ2÷~Ç‡»ÉŸºfL‹;›úáaŞ :°º°®<GB+ƒPÓh_Óàª·\šæŸ‡‡}µÜíåÅCTŞQåÒtácV¶Ä»Õ ó‘ö:’–õ^:%‡ë—úr×%¡¿™—Ÿ4šIûv™56ÒVÚt@«ÔĞ±·£oîĞŠàïñÏ<õlÆ©qRu;F÷5˜(r…³áÑÛ«+•û6?Æ¼ÍOcàêfV£Ñ¬ıòHë’Kâ†_™ÀÌ³™±	´²Û³Ñpp¯=ï^ŠÇK·³·t ²Ÿ<ó—Ÿ‡v››Ê•êöá®^‹Çs*ÚX’R?H1KûÅˆ¿ºÕçî}£9ñR¨âŸsYúg+oJ¿8Ç†_\àåçì¸²;BT¼‡´øŸoğ­­/E¡§§Á¼Ÿ6ÿ EÑx}Ì»íF­ÓÄ¶]ór’Ø2™2š…lÀŠÌ=@jj`Q h€5X89A¡‰•CFj,¤,¸íÎŠh,›–O!!‘‰RÃk]A M®ÅÏJœH˜bA‚•ÔºE#(,ªH¶ ¼úîÊ>4rÂÃW¤R0ä…6µ®7åË—6P8X"ÃHŞŒnŞ¢¤ú^!×§ `™òù•C´R!ô•X©'ÕonFŠ’‹
+àf¸Œ·$€45É^`mÌu£Ä…Áòad6´RD…²1ÔÂ÷mÈ±ÛÙG‰ú<;µô£¶ŸOJ“§õ¬6äyÑÊ	“5Èì¤º‹°*F‘bn×ä,:œK¨Yòá¤°=›Ù¯¤ékM·Øğ4ÙB4Kæ’‹Ş)—Qº6ËãË—¶§ê+‹&“*7R‚ïp{¢äw¼7Ÿ…$ù1e4xI	*#}@\®“«MÀ¾}E$VÑ$xw6²9ÔH^éİ‡06ÜÑÊ¢C(”€y_ŞGÏcò š|Šå¹†‰S&SD­˜!Yhôã
+` D
+ ¢C¦s¹‹£¶†ìÙÚ0AC%’;–o¹º¨¡¸ÉŸˆçeÒD`ÊÜ«{j°6P6f‰Æ6kˆaİE~ÈjfÒIÓÚ£÷ì¥Q`3ÔŞ‹Œ@›si®ÂŠcCeD£EUÔSí7`MêpÇ©›XìB»È‘X<€i*ÚE£‘V!kXä>ÛMÃ’,”g¸–iP ¯q¨¿¢AßÓ#{ì¶ã‚ â`ÄgsÊ…
+©‡¨k°ï^ÛØÛQ½ôÊœQ8¤NÙ JI…{Fî¿uîÀ±Ò„°ŞöµÜÎ÷œk˜¹iÅ˜Hogye+¬=Ä®;7f=,oÊÆ/¼\´šJ@¶•Ğ÷RåÜY…Ç|ó¸Ø{o8P6É4‘UB [F#,CÂÎ Üéı6"Ãç½Ÿ¸.bì¥LH f;v×%®×ÕÎîv;oÊ¢‚ê#ls˜jìÔözäKw.ìYùØ‹½·¸ä<nxDÉ$øÙC$iŞ‹C/zÂ6pıêu{zÑQx®MŒÂfLjCi?yN ‹éÆmkÔšœÊLìl²YT ”²t¹Õñæ7ğŒ!·‚º“”±’5iÎÉ’¡[0b²N0¦aPÀ¢@Ñ j"™
+]Ës€±Kj®HØ0mˆ ƒ·>œÆôSK£H^7Ò?2 %Ì7$Ü›½†2ÄM2ó
+÷Õ«UÉ7bÜÉ;‹jš`ãN!¯¾›‚’Ànl/ÿ .ÿ Ú4İšˆšn#‘Åš4 ‚!d$t³)¸å¿ş5;4N1ÏÈX¾…™H³H í}+]î–½íG²]AÇ‚,V}$¥OÍH,=&OFÿ ~<é•4…”³¹cúG!eb‰Ü*À)dï©÷B½°´T– å¸©Ä†Êt¨[Q]Œfö¿?Íì¢©,`^ ÏHêÊÊ¶e*ö
+/`m{(éÓÃj*šB9dY3WhÊX Ê·cÈ¥¬	²Í†ßK2‚ÎEÎØ,>räÜ .¡rA²:n<,äØŞ¢¦°$KïÄGaXuÖÌÍråÍùt¥TW6Âê¼a±X÷—Ò·0G=€EK…”U‘‚‰D¤ÚÁšr–J¦¡[0¢²J0¦@ˆ¡¢@Š Q@Q@0* 4QLÅ1…QBµ ÇDc­2’)¢+%SPFJ† Œ•M¶L†[0Â²OJÆÈS
+5@™ "‰D¢A¨Š|(aD¢¨Œ(€"˜Š‚Œ(€qP\-6Ec­+$Z"2U5dªj²d5fÈ= Â˜QÁ¦B°Ñ EQ ÔPDÈ¢ Š T@¦ Âˆ£
+ Q&	 ö™@Ãàj¦:ƒáDF™"ßÀÓ!d‹î¦Û¨­1ÔÔ¢T5
+Ù*š…lÄŠÇ=ÀÓŒÅ6E¢ Ñ E Ñ h LáPƒƒDPÑDQ E0¯N"Ã³F –IX3Ø…[*‚äš¦Pâ–üŒëÛ©SÄ!±°Á$¯‘±„º-¨0a¹ñVømQ6“Ç	(Æ¤àª:»oæIÕÂÅŒr«všEµ<ªàî-Ôxì Ó[ÄjÑššŒ*¾xßëøa&î=pXf@ ÆÀcŞüàÛØixãòŒ©Um.Õïåáãâ}æ“\?^ó  ›€ÆÖÑÇ>`xÑãÈNÊ®Rí¹åzc¢š8İÆ0¾‹\   ÈÑó'Ÿvö·_eé£(Éã„JÑ«NJ®qùÁƒâ‹Ê±]Ï[_­vÒÛb›iJQr‘ÏCW²U5f(V1è˜Â™ jaG™
+ÃDQD¢ Ó ¡)D 5”ÑS ŸŠ’=‘ÊßÂ¦2U:PŸõ,“şSŸñ[éC„¯İ¨ü¨a™Oø¯ô£Àw£ò ŒÂÅ¥N;z_*cæügú}¨ö~"ö¾T0ÆÍøÏôûTìüAØÒùP ’nÄ±<ËšxÅ ½–Â%SN#%SP­˜±XÈôlaE8¦¦B)€P¢A…S 4@5QDFQ¢(Â˜
+€¢Å1ÖˆŒu¢+$Z"²E5dÊhˆÌ`¬Tz!…XÀÓ!GÂŒ)Å@D@L Š„¢€0¦ h€"ˆ@Æ@0¢…F@8¨+aY 4E$SPFH¦ˆ¬Ç
+Ä=S
+ĞÔÈAÅ0Â™1F@Dr…Ş;_• á„QB„Q i‘©‘B(z9 @¢àÀÂŠhV†ÀT’
+ hu¢„$SDVH¦ †>±èZd#S
+ÆÈaL(Â˜V5@Q M0rÏdÿ 6°yŒÑ~HÁ#a–5&”¸Ærui[\´‡?¯ëüGsşƒ‘›pqoù1û<1>Ø—aŠ¹RÇBk¶ïtÚ­Y6¾.~„t¢—"3Âyjâ°q*vÉ™bdšüÌ¿Íõ*lÜÌ‡™¹²ÑU&Ó}?Q](gåÙU‰@¸	"9‚ãÕHÄÈİ‰Âê³€G}šÂ÷Ø[—‰s©¼òÇwQx`ñ·<axOØ$s‡}–ùËæ=½•1ZI0ö<¬n{øïEÕ—>ücì¢âK›pŞ]¢xÖ‡l4Y\?jí¶%Õeº1Ò Ÿ}ÔSÎy¯@NœTyt.qK.Ì–,áP6	c™¦2ŒJ,âÎô}+íë
+ZsrœróÏèJQ„’EnÃ.#(“Ä/Ÿcæ†6?£2áVhÏÎ/­=vãW‰w/ÜZ1Ì1âuxƒ	`ğ ˆ=²ÜÓÌP1[ÉÊZÄ\é[ØíINNšo=ë?¸ÒJ§§ääã8o	…†gŸÌğey|¬«­±SI$rA=BíËmªØÕœä”_6ı
+İÆ-¾xû–sşÃG#ü‰ ,š,YˆlF…".Í‰bH·?˜¥§^M­òóŒc»¨Ó¡»º–x·‚y±SM†mX)rÃ;öùèfTW]Ú,£koqï(º‰E'Ï‹AjÆÉµËS5Æù6ÙÃšGiågÇü™œŒ:Ø›z"äó®›z’©–ùmëŞsÜSŒKÿ ìf®£‘’DFd/XHô,aE
+ÇèVL â˜Q…0ÔEQ0ıvôtúGÑõ}ŞÊ˜AË •­mMkZ×6·…¼(á,½™fób6‘€0Ã1Æ€‘FU {ÏÎ„`’k¨e6Ê‹3Y˜i¾›µùÛÂôøBeŸ6µÍ¯{_køÛÆ›Ä|‡2±½ÙÀäî |j$–Õ­mMkk›Xrğ£…’6ÆIXrf7$Xøûı´ØBñ42ÊÛw›»èîv÷xQI¶1•ˆ ³@sÈrêœ+ 8™s5Í¦ÅHd™®Ìâ„]¼lô!MAlIÍÉå•Ì¬ov'Uµ\íÊş4øB6Ë™¦g.*S,Ä`£º€ª¡T*€°!„
+’ryeqNVH¦ˆ­XHôaL+d ôÂ±…0¬aL€0¦È£
+€¢@Š`ˆPƒS
+DQ@¢A…QBŒ(€`h€aDƒDV8¢(àÑ™ ñ¬$z1„ƒÆ™I…Œ%_*hW0™|2œEìä2øı7ivr·_¡£ÚÇ¨;9tbÇèhö°ê/e>ó”ñú=¬:“²—@ùÊzßCö£ÚÃ¨;)ôœ§­ô4{hu'c>ó¤õ¾‡íEV‡Q{)ôÅ'­ô5;hu'e>¤õ¾†›¶‡Rv3è‹O[èjvôúş¢ö3è;Öúµ7¼Sëú“±Ÿ@ùä~·Ğıªvôúƒ±ŸA†6?[è~Ô{z}AØO |ö?[è~Ô}âŸRv:1ÑúßCö£ïúƒİêtÇEë}Ú§¼Sêw©Ğa‹×úµ7¼Sêw©Ğa˜EëıÚ§¼Sê/»Ôè0Ìbõşö£ïú‹îÕ:3}£}¨ûÍ> ÷Z½?CÿÙ
